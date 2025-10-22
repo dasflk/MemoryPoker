@@ -1991,6 +1991,15 @@ MonoBehaviour:
   m_ban_num: 3
   m_result_flip_term: 1.5
   m_result_player_term: 2
+  m_fail_msg:
+  - "\uD50C\uB808\uC774\uC5B4"
+  - "\uC785\uB825 \uD615\uC2DD \uC624\uB958(N,N,N)"
+  - '1 ~ '
+  - "\uBC88\uC758 \uCE74\uB4DC\uB9CC \uC785\uB825 \uAC00\uB2A5\uD569\uB2C8\uB2E4"
+  - "\uBC88\uC740 \uAE08\uC9C0\uB41C \uCE74\uB4DC\uC785\uB2C8\uB2E4"
+  - "\uC798\uBABB\uB41C \uD615\uC2DD \uC785\uB2C8\uB2E4(\uC22B\uC790,\uC22B\uC790,\uC22B\uC790)"
+  - "\uCE74\uB4DC \uBC88\uD638\uB97C \uC785\uB825\uD55C \uD50C\uB808\uC774\uC5B4\uAC00
+    \uC5C6\uC2B5\uB2C8\uB2E4"
   m_board: {fileID: 1702115028}
   m_start_btn: {fileID: 1067045042}
   m_ban_btn: {fileID: 1476849543}

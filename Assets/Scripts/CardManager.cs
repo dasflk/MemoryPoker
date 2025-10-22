@@ -13,6 +13,8 @@ public class CardManager : MonoBehaviour
     private float m_result_flip_term;
     [SerializeField]
     private float m_result_player_term;
+    [SerializeField]
+    private string[] m_fail_msg;
 
     // UI
     [SerializeField]
@@ -179,7 +181,7 @@ public class CardManager : MonoBehaviour
             // 덱 3가지 선택 체크
             if (input_decks.Length != 3)
             {
-                fail_message = "플레이어" + (i + 1).ToString() + " 입력 형식 오류(N,N,N)";
+                fail_message = m_fail_msg[0] /*+"플레이어"*/ + (i + 1).ToString() + m_fail_msg[01]/*" 입력 형식 오류(N,N,N)"*/;
                 is_fail = true;
                 break;
             }
@@ -194,14 +196,14 @@ public class CardManager : MonoBehaviour
 
                     if (result < 1 || result > m_card_num)
                     {
-                        fail_message = "1 ~ " + m_card_num.ToString() + "번의 카드만 입력 가능합니다";
+                        fail_message = m_fail_msg[2] /*"1 ~ "*/ + m_card_num.ToString() + m_fail_msg[3]/*"번의 카드만 입력 가능합니다"*/;
                         is_fail = true;
                         break;
                     }
 
                     if (m_ban_card_index.Contains(result - 1))
                     {
-                        fail_message = result.ToString() + "번은 금지된 카드입니다";
+                        fail_message = result.ToString() + m_fail_msg[4]/*"번은 금지된 카드입니다"*/;
                         is_fail = true;
                         break;
                     }
@@ -212,7 +214,7 @@ public class CardManager : MonoBehaviour
                 else
                 {
                     Debug.Log("변환 실패");
-                    fail_message = "잘못된 형식 입니다(숫자,숫자,숫자)";
+                    fail_message = m_fail_msg[5]/*"잘못된 형식 입니다(숫자,숫자,숫자)"*/;
                     is_fail = true;
                     return;
                 }
@@ -226,7 +228,7 @@ public class CardManager : MonoBehaviour
 
         if (empty == true && is_fail == false)
         {
-            fail_message = "카드 번호를 입력한 플레이어가 없습니다";
+            fail_message = m_fail_msg[6]/*"카드 번호를 입력한 플레이어가 없습니다"*/;
             is_fail = true;
         }
 
