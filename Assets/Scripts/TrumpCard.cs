@@ -24,21 +24,23 @@ public class TrumpCard : MonoBehaviour
     private Animator m_animator;
     private Canvas m_overlay_canvas;
 
-    private void Start()
+    private void Awake()
     {
         m_is_front = true;
         m_is_ban = false;
-        m_front_sprite = gameObject.GetComponent<Image>().sprite;
+        //m_front_sprite = gameObject.GetComponent<Image>().sprite;
         m_animator = gameObject.GetComponent<Animator>();
         m_back_img = gameObject.GetComponent<Image>();
     }
 
-    public void initCard(int index, int num, Sprite pattern, Sprite back_sprite)
+    public void initCard(int index, int num, Sprite pattern, Sprite back_sprite, Sprite img)
     {
         m_back_number.text = index.ToString();
         m_text.text = (num == 1) ? "A" : num.ToString();
         m_pattern_img.sprite = pattern;
         m_back_sprite = back_sprite;
+        m_back_img.sprite = img;
+        m_front_sprite = img;
         m_ban.SetActive(false);
 
         if (m_overlay_canvas != null)
@@ -57,6 +59,11 @@ public class TrumpCard : MonoBehaviour
     public void setBan()
     {
         m_is_ban = true;
+    }
+
+    public Sprite getFrontSprite()
+    {
+        return m_front_sprite;
     }
 
     public void animateSelect(int sort)
@@ -117,16 +124,16 @@ public class TrumpCard : MonoBehaviour
         m_is_front = !m_is_front;
         if (m_is_front == true)
         {
-            m_text.gameObject.transform.parent.gameObject.SetActive(true);
-            m_pattern_img.gameObject.transform.parent.gameObject.SetActive(true);
+            //m_text.gameObject.transform.parent.gameObject.SetActive(true);
+            //m_pattern_img.gameObject.transform.parent.gameObject.SetActive(true);
 
             m_back_number.gameObject.transform.parent.gameObject.SetActive(false);
             m_back_img.sprite = m_front_sprite;
         }
         else
         {
-            m_text.gameObject.transform.parent.gameObject.SetActive(false);
-            m_pattern_img.transform.parent.gameObject.gameObject.SetActive(false);
+            //m_text.gameObject.transform.parent.gameObject.SetActive(false);
+            //m_pattern_img.transform.parent.gameObject.gameObject.SetActive(false);
 
             m_back_number.gameObject.transform.parent.gameObject.SetActive(true);
             m_back_img.sprite = m_back_sprite;
@@ -140,11 +147,15 @@ public class TrumpCard : MonoBehaviour
         {
             //m_back_img.color = new Color32(70, 70, 70, 255);
             banCard();
+            if (m_overlay_canvas != null)
+                m_overlay_canvas.sortingOrder = 0;
         }
     }
 
     public void OnOpen()
     {
         m_is_front = true;
+        if (m_overlay_canvas == null)
+            m_overlay_canvas.sortingOrder = 0;
     }
 }

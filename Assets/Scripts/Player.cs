@@ -16,12 +16,20 @@ public class Player : MonoBehaviour
     private GameObject m_deck_edit_btn;
     [SerializeField]
     private GameObject m_deck_ok_btn;
+    [SerializeField]
+    private GameObject m_result_panel;
+    [SerializeField]
+    private GameObject m_character_panel;
+    [SerializeField]
+    private Image[] m_result_image;
 
-	public void init()
+    public void init()
 	{
         m_deck_input.text = "";
         m_deck_input_text.text = "";
+        setBtnState(true);
         OnDeckEdit();
+        showResult(false);
     }
 
 	public string getDeckString()
@@ -34,6 +42,23 @@ public class Player : MonoBehaviour
         return m_name_input.text;
     }
 
+    public void showResult(bool is_true)
+    {
+        m_character_panel.SetActive(!is_true);
+        m_result_panel.SetActive(is_true);
+    }
+
+    public void setResultSprite(int index, Sprite sprite)
+    {
+        m_result_image[index].sprite = sprite;
+    }
+
+    public void setBtnState(bool is_enable)
+    {
+        m_deck_ok_btn.GetComponent<Button>().enabled = is_enable;
+        m_deck_edit_btn.GetComponent<Button>().enabled = is_enable;
+    }
+
     public void OnDeckEdit()
     {
         m_deck_input_text.gameObject.SetActive(false);
@@ -44,8 +69,12 @@ public class Player : MonoBehaviour
     }
     public void OnDeckOk()
     {
-        if (IsValidDeck(m_deck_input.text) == false)
-            return;
+        if (m_deck_input.text != "" ||
+            string.IsNullOrWhiteSpace(m_deck_input.text) == false)
+        {
+            if (IsValidDeck(m_deck_input.text) == false)
+                return;
+        }
 
         m_deck_input_text.text = m_deck_input.text;
 

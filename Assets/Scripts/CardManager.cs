@@ -9,6 +9,10 @@ public class CardManager : MonoBehaviour
 {
     [SerializeField]
     private int m_ban_num; // 밴 카드 수
+    [SerializeField]
+    private float m_result_flip_term;
+    [SerializeField]
+    private float m_result_player_term;
 
     // UI
     [SerializeField]
@@ -31,6 +35,14 @@ public class CardManager : MonoBehaviour
     private Sprite m_card_back_sprite;
     [SerializeField]
     private int m_card_num; // 카드 수
+    [SerializeField]
+    private Sprite[] m_card_pack1;
+    [SerializeField]
+    private Sprite[] m_card_pack2;
+    [SerializeField]
+    private Sprite[] m_card_pack3;
+    [SerializeField]
+    private Sprite[] m_card_pack4;
 
     // 타이머
     [SerializeField]
@@ -120,7 +132,17 @@ public class CardManager : MonoBehaviour
             TrumpCard card = Instantiate(m_card_prefab, m_board.transform).GetComponent<TrumpCard>();
             Debug.Log("rand : " + rand_value.Item1.ToString() + "pattern_num : " + rand_value.Item2.ToString());
 
-            card.initCard(index + 1, rand_value.Item1, m_card_sprites[rand_value.Item2], m_card_back_sprite);
+            Sprite sprite = null;
+            if (rand_value.Item2 == 0)
+                sprite = m_card_pack1[rand_value.Item1 - 1];
+            else if (rand_value.Item2 == 1)
+                sprite = m_card_pack2[rand_value.Item1 - 1];
+            else if (rand_value.Item2 == 2)
+                sprite = m_card_pack3[rand_value.Item1 - 1];
+            else if (rand_value.Item2 == 3)
+                sprite = m_card_pack4[rand_value.Item1 - 1];
+
+            card.initCard(index + 1, rand_value.Item1, m_card_sprites[rand_value.Item2], m_card_back_sprite, sprite);
             m_cards.Add(card);
               
             index++;
@@ -138,6 +160,9 @@ public class CardManager : MonoBehaviour
     public void OnShowDown()
     {
         Debug.Log("click show_down !");
+        bool is_fail = false;
+        bool empty = true;
+        string fail_message = "";
         
         for (int i = 0; i < m_players.Count; i++)
 		{
@@ -154,8 +179,9 @@ public class CardManager : MonoBehaviour
             // 덱 3가지 선택 체크
             if (input_decks.Length != 3)
             {
-                ShowMessage("플레이어" + (i + 1).ToString() + "의 카드 선택 오류");
-                return;
+                fail_message = "플레이어" + (i + 1).ToString() + " 입력 형식 오류(N,N,N)";
+                is_fail = true;
+                break;
             }
 
             // 덱 정수 변환
@@ -168,27 +194,52 @@ public class CardManager : MonoBehaviour
 
                     if (result < 1 || result > m_card_num)
                     {
-                        ShowMessage("1 ~ " + m_card_num.ToString() + " 카드가 아닙니다");
-                        return;
+                        fail_message = "1 ~ " + m_card_num.ToString() + "번의 카드만 입력 가능합니다";
+                        is_fail = true;
+                        break;
                     }
 
                     if (m_ban_card_index.Contains(result - 1))
                     {
-                        ShowMessage(result.ToString() + " 금지된 카드입니다");
-                        return;
+                        fail_message = result.ToString() + "번은 금지된 카드입니다";
+                        is_fail = true;
+                        break;
                     }
 
+                    empty = false;
                     decks.Add(result);
                 }
                 else
                 {
                     Debug.Log("변환 실패");
-                    ShowMessage("잘못된 값 입니다");
+                    fail_message = "잘못된 형식 입니다(숫자,숫자,숫자)";
+                    is_fail = true;
                     return;
                 }
             }
 
+            if (is_fail)
+                break;
+
             m_player_decks.Add(cur_player, decks);
+        }
+
+        if (empty == true && is_fail == false)
+        {
+            fail_message = "카드 번호를 입력한 플레이어가 없습니다";
+            is_fail = true;
+        }
+
+        if (is_fail)
+        {
+            ShowMessage(fail_message);
+            m_player_decks.Clear();
+            return;
+        }
+
+		foreach (var player in m_players)
+		{
+            player.setBtnState(false);
         }
 
         m_show_dwon_btn.SetActive(false);
@@ -226,22 +277,28 @@ public class CardManager : MonoBehaviour
     {
 		foreach (var player_deck in m_player_decks)
 		{
-			for (int i = 0; i < player_deck.Value.Count; i++)
+            player_deck.Key.GetComponent<Animator>().SetBool("select", true);
+
+            for (int i = 0; i < player_deck.Value.Count; i++)
 			{
                 if (m_cards[player_deck.Value[i] - 1].isFront() == false)
                 {
                     m_cards[player_deck.Value[i] - 1].animateOpen(m_canvas_sort);
-                    m_canvas_sort++;
                 }
                 else
                 {
                     m_cards[player_deck.Value[i] - 1].animateSelect(m_canvas_sort);
-                    m_canvas_sort++;
                 }
 
-                yield return new WaitForSeconds(0.5f); // 1초 대기
+                player_deck.Key.setResultSprite(i, m_cards[player_deck.Value[i] - 1].getFrontSprite());
+                m_canvas_sort++;
+
+                yield return new WaitForSeconds(m_result_flip_term); // 1초 대기
             }
-            yield return new WaitForSeconds(1f); // 1초 대기
+
+            player_deck.Key.GetComponent<Animator>().SetBool("select", false);
+            yield return new WaitForSeconds(m_result_player_term); // 1초 대기
+            player_deck.Key.showResult(true);
         }
 
 		foreach (var card in m_cards)
